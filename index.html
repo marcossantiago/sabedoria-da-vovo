@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Sabedoria da Vovó — Uma coleção de ditados e sabedoria da nossa avó querida.">
+  <meta name="theme-color" content="#c8a45c">
+  <title>Sabedoria da Vovó</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✨</text></svg>">
+</head>
+<body>
+
+  <nav class="site-nav">
+    <a href="#/" class="nav-logo">Sabedoria da Vovó</a>
+    <ul class="nav-links">
+      <li><a href="#/">Início</a></li>
+      <li><a href="#/ditados">Ditados</a></li>
+      <li><a href="#/aleatorio">Aleatório</a></li>
+      <li><a href="#/adicionar">Adicionar</a></li>
+    </ul>
+    <button class="nav-hamburger" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+
+  <button class="random-float" title="Ditado aleatório" aria-label="Ditado aleatório">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="16 3 21 3 21 8"></polyline>
+      <line x1="4" y1="20" x2="21" y2="3"></line>
+      <polyline points="21 16 21 21 16 21"></polyline>
+      <line x1="15" y1="15" x2="21" y2="21"></line>
+      <line x1="4" y1="4" x2="9" y2="9"></line>
+    </svg>
+  </button>
+
+  <!-- HOME -->
+  <div id="page-home" class="page active">
+    <section class="hero">
+      <div class="hero-bg"></div>
+      <div class="bubbles-container" id="bubbles"></div>
+      <h1 class="hero-title">Sabedoria da Eulina</h1>
+      <p class="hero-subtitle">Uma vida inteira de sabedoria, um ditado de cada vez</p>
+      <p class="hero-age">91 anos de histórias &amp; verdades</p>
+      <div class="scroll-hint">
+        <span>Explorar</span>
+        <div class="scroll-hint-line"></div>
+      </div>
+    </section>
+  </div>
+
+  <!-- ALL SAYINGS -->
+  <div id="page-list" class="page">
+    <section class="sayings-section">
+      <div class="section-header">
+        <h2>Todos os Ditados</h2>
+        <span class="ornament"></span>
+        <p>As palavras que carregamos no coração</p>
+      </div>
+      <div class="search-bar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <input type="text" id="search-input" placeholder="Buscar ditados...">
+      </div>
+      <p class="counter" id="sayings-counter"></p>
+      <div id="sayings-list"></div>
+    </section>
+    <footer class="site-footer">
+      <p>Feito com <span class="heart">&hearts;</span> pela família</p>
+    </footer>
+  </div>
+
+  <!-- SINGLE SAYING -->
+  <div id="page-single" class="page">
+    <section class="single-saying" id="single-content"></section>
+  </div>
+
+  <!-- ADD FORM -->
+  <div id="page-form" class="page">
+    <section class="form-section">
+      <h2>Adicionar Ditado</h2>
+      <p class="form-intro">Compartilhe mais uma pérola de sabedoria da família</p>
+
+      <div id="password-gate" class="password-gate">
+        <p>Insira a senha da família para continuar:</p>
+        <input type="password" id="pw-input" placeholder="Senha da família">
+        <button class="btn btn-filled" id="pw-btn">Entrar</button>
+      </div>
+
+      <div id="form-area" style="display:none;">
+        <form id="saying-form">
+          <div class="form-group">
+            <label for="field-text">O Ditado *</label>
+            <textarea id="field-text" placeholder="Ex: Água mole em pedra dura..." required></textarea>
+          </div>
+          <div class="form-group">
+            <label for="field-context">Contexto</label>
+            <input type="text" id="field-context" placeholder="Quando a vovó costuma dizer isso?">
+          </div>
+          <div class="form-group">
+            <label for="field-author">Quem disse</label>
+            <input type="text" id="field-author" placeholder="Vovó (padrão)">
+          </div>
+          <div class="form-group">
+            <label for="field-token">GitHub Token (opcional)</label>
+            <input type="password" id="field-token" placeholder="Para criar PR automaticamente">
+            <small style="color:var(--sepia-lighter);font-size:0.75rem;display:block;margin-top:0.3rem;">
+              Se deixar vazio, o ditado será gerado para você copiar e enviar manualmente.
+            </small>
+          </div>
+          <button type="submit" class="btn btn-filled" style="width:100%;justify-content:center;">Enviar Ditado</button>
+        </form>
+        <div id="form-message" class="form-message"></div>
+      </div>
+    </section>
+  </div>
+
+  <script src="js/app.js"></script>
+</body>
+</html>
