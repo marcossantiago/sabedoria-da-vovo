@@ -1,21 +1,13 @@
 (function () {
   'use strict';
 
-  // ─── CONFIG ─── (edit these for your repo)
-  const CONFIG = {
-    repoOwner: 'YOUR_GITHUB_USERNAME',
-    repoName: 'sabedoria-da-vovo',
-    branch: 'main',
-    formPassword: 'coutinho',
-    siteName: 'Sabedoria da Eulina',
-    grandmaName: 'Eulina',
-  };
+  const CONFIG = SABEDORIA_CONFIG;
 
   let sayings = [];
   let currentSayingId = null;
-  let formUnlocked = false;
 
   async function init() {
+    applyConfig();
     await loadSayings();
     setupRouter();
     setupNav();
@@ -23,10 +15,37 @@
     handleRoute();
   }
 
+  function applyConfig() {
+    const name = CONFIG.grandmaName;
+    const site = CONFIG.siteName;
+    const age  = CONFIG.grandmaAge;
+
+    document.title = site;
+
+    const metaDesc = document.querySelector('meta[name="description"]');
+    if (metaDesc) metaDesc.setAttribute('content', `${site} — Uma coleção de ditados e sabedoria da nossa ${name} querida.`);
+
+    const navLogo = document.querySelector('.nav-logo');
+    if (navLogo) navLogo.textContent = site;
+
+    const heroTitle = document.querySelector('.hero-title');
+    if (heroTitle) heroTitle.textContent = site;
+
+    const heroAge = document.querySelector('.hero-age');
+    if (heroAge) heroAge.textContent = age ? `${age} anos de histórias & verdades` : '';
+
+    const fieldContext = document.getElementById('field-context');
+    if (fieldContext) fieldContext.placeholder = `Quando ${name} costuma dizer isso?`;
+
+    const fieldAuthor = document.getElementById('field-author');
+    if (fieldAuthor) fieldAuthor.placeholder = `${name} (padrão)`;
+  }
+
   async function loadSayings() {
     try {
       const res = await fetch('sayings/data.json');
-      sayings = await res.json();
+      const data = await res.json();
+      sayings = data.map((s, i) => ({ ...s, id: i + 1 }));
     } catch (e) {
       console.error('Failed to load sayings:', e);
       sayings = [];
@@ -176,80 +195,42 @@
 
   // ─── FORM ───
   function setupForm() {
-    const gate = document.getElementById('password-gate');
-    const formArea = document.getElementById('form-area');
     const form = document.getElementById('saying-form');
-    const msg = document.getElementById('form-message');
+    const msg  = document.getElementById('form-message');
+    if (!form) return;
 
-    gate.style.display = formUnlocked ? 'none' : 'block';
-    formArea.style.display = formUnlocked ? 'block' : 'none';
-
-    const pwBtn = document.getElementById('pw-btn');
-    const pwInput = document.getElementById('pw-input');
-    if (pwBtn) {
-      pwBtn.onclick = () => {
-        if (pwInput.value === CONFIG.formPassword) {
-          formUnlocked = true; gate.style.display = 'none'; formArea.style.display = 'block';
-        } else {
-          pwInput.style.borderColor = '#c4837a'; pwInput.value = ''; pwInput.placeholder = 'Senha incorreta...';
-        }
-      };
-      pwInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') pwBtn.click(); });
-    }
-
-    if (form) form.onsubmit = async (e) => {
+    form.onsubmit = async (e) => {
       e.preventDefault();
-      const text = document.getElementById('field-text').value.trim();
-      const context = document.getElementById('field-context').value.trim();
-      const author = document.getElementById('field-author').value.trim() || CONFIG.grandmaName;
-      const token = document.getElementById('field-token').value.trim();
+      const text     = document.getElementById('field-text').value.trim();
+      const context  = document.getElementById('field-context').value.trim();
+      const author   = document.getElementById('field-author').value.trim() || CONFIG.grandmaName;
+      const password = document.getElementById('field-password').value;
 
       if (!text) { showMsg(msg, 'error', 'O ditado é obrigatório!'); return; }
 
-      if (!token) {
+      if (!CONFIG.apiEndpoint) {
         const today = new Date().toISOString().split('T')[0];
         const json = JSON.stringify({ text, author, date: today, context: context || null, image: null }, null, 2);
-        showMsg(msg, 'success', `<strong>Ditado registrado!</strong><br><br>Para adicionar ao site, envie este texto para o administrador ou adicione ao arquivo <code>sayings/data.json</code>:<br><br><code style="display:block;background:var(--cream);padding:0.8rem;font-size:0.8rem;text-align:left;word-break:break-all;border:1px solid var(--gold-light);margin-top:0.5rem;">${esc(json)}</code>`);
+        showMsg(msg, 'success', `<strong>Ditado registrado!</strong><br><br>Adicione ao arquivo <code>sayings/data.json</code>:<br><br><code style="display:block;background:var(--cream);padding:0.8rem;font-size:0.8rem;text-align:left;word-break:break-all;border:1px solid var(--gold-light);margin-top:0.5rem;">${esc(json)}</code>`);
         form.reset(); return;
       }
 
       try {
-        showMsg(msg, 'success', 'Criando Pull Request...');
-        await createPR(token, text, context, author);
-        showMsg(msg, 'success', 'Pull Request criado com sucesso! O ditado será revisado e adicionado em breve.');
+        showMsg(msg, 'info', 'Enviando sugestão...');
+        const res = await fetch(CONFIG.apiEndpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text, author, context: context || null, password }),
+        });
+        const data = await res.json().catch(() => ({}));
+        if (res.status === 401) { showMsg(msg, 'error', 'Senha incorreta.'); return; }
+        if (!res.ok) throw new Error(data.error || `Erro ${res.status}`);
+        showMsg(msg, 'success', 'Ditado enviado! Um Pull Request foi aberto para revisão.');
         form.reset();
       } catch (err) {
-        showMsg(msg, 'error', 'Erro ao criar PR: ' + err.message);
+        showMsg(msg, 'error', 'Erro ao enviar: ' + err.message);
       }
     };
-  }
-
-  async function createPR(token, text, context, author) {
-    const api = `https://api.github.com/repos/${CONFIG.repoOwner}/${CONFIG.repoName}`;
-    const h = { 'Authorization': `token ${token}`, 'Accept': 'application/vnd.github.v3+json', 'Content-Type': 'application/json' };
-
-    const fileRes = await fetch(`${api}/contents/sayings/data.json?ref=${CONFIG.branch}`, { headers: h });
-    if (!fileRes.ok) throw new Error('Não conseguiu acessar o repositório');
-    const fileData = await fileRes.json();
-    const current = JSON.parse(atob(fileData.content.replace(/\n/g, '')));
-
-    const newId = Math.max(...current.map(s => s.id), 0) + 1;
-    const today = new Date().toISOString().split('T')[0];
-    current.push({ id: newId, text, author, date: today, context: context || null, image: null });
-
-    const branchName = `novo-ditado-${newId}-${Date.now()}`;
-    const refRes = await fetch(`${api}/git/ref/heads/${CONFIG.branch}`, { headers: h });
-    const sha = (await refRes.json()).object.sha;
-
-    await fetch(`${api}/git/refs`, { method: 'POST', headers: h, body: JSON.stringify({ ref: `refs/heads/${branchName}`, sha }) });
-    await fetch(`${api}/contents/sayings/data.json`, {
-      method: 'PUT', headers: h,
-      body: JSON.stringify({ message: `Novo ditado: "${text.substring(0,50)}..."`, content: btoa(unescape(encodeURIComponent(JSON.stringify(current, null, 2)))), branch: branchName, sha: fileData.sha })
-    });
-    await fetch(`${api}/pulls`, {
-      method: 'POST', headers: h,
-      body: JSON.stringify({ title: `Novo ditado: "${text.substring(0,60)}"`, body: `**Novo ditado**\n\n> ${text}\n\n**Contexto:** ${context||'N/A'}\n**Autor:** ${author}\n**Data:** ${today}`, head: branchName, base: CONFIG.branch })
-    });
   }
 
   function showMsg(el, type, html) { el.className = 'form-message ' + type; el.innerHTML = html; el.style.display = 'block'; }

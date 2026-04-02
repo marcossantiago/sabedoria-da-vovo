@@ -1,0 +1,18 @@
+name = "sabedoria-api"
+main = "index.js"
+compatibility_date = "2024-09-23"
+
+[vars]
+GITHUB_OWNER  = "marcossantiago"
+GITHUB_REPO   = "sabedoria-da-vovo"
+GITHUB_BRANCH = "main"
+
+# Secrets — never stored here, set once via CLI:
+#
+#   wrangler secret put GITHUB_TOKEN
+#     Generate at https://github.com/settings/tokens (fine-grained)
+#     Required permissions: Contents (Read & Write) + Pull requests (Read & Write)
+#     Scope it to this specific repository only.
+#
+#   wrangler secret put FORM_PASSWORD
+#     The shared family password required to submit sayings.
