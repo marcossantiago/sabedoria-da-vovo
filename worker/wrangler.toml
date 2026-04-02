@@ -1,6 +1,7 @@
 name = "sabedoria-api"
 main = "index.js"
 compatibility_date = "2024-09-23"
+workers_dev = true
 
 [vars]
 GITHUB_OWNER  = "marcossantiago"
