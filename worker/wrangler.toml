@@ -8,7 +8,7 @@ GITHUB_OWNER  = "marcossantiago"
 GITHUB_REPO   = "sabedoria-da-vovo"
 GITHUB_BRANCH = "main"
 
-# Secrets — never stored here, set once via CLI:
+# Secrets — set once via CLI, stored securely in Cloudflare:
 #
 #   wrangler secret put GITHUB_TOKEN
 #     Generate at https://github.com/settings/tokens (fine-grained)

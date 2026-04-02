@@ -26,7 +26,7 @@ export default {
     }
 
     const text    = body.text?.trim();
-    const author  = body.author?.trim()  || 'Vó';
+    const author  = body.author?.trim()  || null;
     const context = body.context?.trim() || null;
 
     if (!text) {

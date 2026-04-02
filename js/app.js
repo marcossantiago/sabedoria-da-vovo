@@ -38,7 +38,7 @@
     if (fieldContext) fieldContext.placeholder = `Quando ${name} costuma dizer isso?`;
 
     const fieldAuthor = document.getElementById('field-author');
-    if (fieldAuthor) fieldAuthor.placeholder = `${name} (padrão)`;
+    if (fieldAuthor) fieldAuthor.placeholder = 'Seu nome';
   }
 
   async function loadSayings() {
@@ -155,7 +155,7 @@
           <blockquote>${esc(s.text)}</blockquote>
           ${s.context ? `<p class="context">${esc(s.context)}</p>` : ''}
           <div class="meta">
-            <span>${s.author || CONFIG.grandmaName} &middot; ${fmtDate(s.date)}</span>
+            <span>${s.author ? `Ouvido por ${esc(s.author)} &middot; ` : ''}${fmtDate(s.date)}</span>
             <button class="share-btn" onclick="event.stopPropagation();window.sabedoria.share(${s.id})" title="Compartilhar">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8M16 6l-4-4-4 4M12 2v13"/></svg>
             </button>
@@ -184,7 +184,7 @@
         ${saying.image ? `<img class="saying-image" src="img/${saying.image}" alt="" loading="lazy">` : ''}
         <blockquote>${esc(saying.text)}</blockquote>
         ${saying.context ? `<p class="context">${esc(saying.context)}</p>` : ''}
-        <p class="meta">${saying.author || CONFIG.grandmaName} &middot; ${fmtDate(saying.date)}</p>
+        <p class="meta">${saying.author ? `Ouvido por ${esc(saying.author)} &middot; ` : ''}${fmtDate(saying.date)}</p>
         <div class="single-saying-nav">
           <button class="btn" onclick="window.sabedoria.prev()">&#8592; Anterior</button>
           <button class="btn btn-filled" onclick="window.sabedoria.random()">Aleatório</button>
@@ -210,7 +210,7 @@
       e.preventDefault();
       const text     = document.getElementById('field-text').value.trim();
       const context  = document.getElementById('field-context').value.trim();
-      const author   = document.getElementById('field-author').value.trim() || CONFIG.grandmaName;
+      const author   = document.getElementById('field-author').value.trim() || null;
       const password = document.getElementById('field-password').value;
 
       if (!text) { showMsg(msg, 'error', 'O ditado é obrigatório!'); return; }
