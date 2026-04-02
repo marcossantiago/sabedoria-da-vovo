@@ -197,7 +197,14 @@
   function setupForm() {
     const form = document.getElementById('saying-form');
     const msg  = document.getElementById('form-message');
-    if (!form) return;
+    if (!form || !msg) return;
+
+    // Clear any message left from a previous visit
+    msg.className = 'form-message';
+    msg.style.display = 'none';
+
+    const submitBtn = form.querySelector('button[type="submit"]');
+    const originalBtnText = submitBtn ? submitBtn.textContent : '';
 
     form.onsubmit = async (e) => {
       e.preventDefault();
@@ -215,8 +222,10 @@
         form.reset(); return;
       }
 
+      if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = 'Enviando...'; }
+      showMsg(msg, 'info', 'Enviando sugestão...');
+
       try {
-        showMsg(msg, 'info', 'Enviando sugestão...');
         const res = await fetch(CONFIG.apiEndpoint, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -225,15 +234,22 @@
         const data = await res.json().catch(() => ({}));
         if (res.status === 401) { showMsg(msg, 'error', 'Senha incorreta.'); return; }
         if (!res.ok) throw new Error(data.error || `Erro ${res.status}`);
-        showMsg(msg, 'success', 'Ditado enviado! Um Pull Request foi aberto para revisão.');
+        showMsg(msg, 'success', 'Ditado enviado! Um Pull Request foi aberto para revisão. ✓');
         form.reset();
       } catch (err) {
         showMsg(msg, 'error', 'Erro ao enviar: ' + err.message);
+      } finally {
+        if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = originalBtnText; }
       }
     };
   }
 
-  function showMsg(el, type, html) { el.className = 'form-message ' + type; el.innerHTML = html; el.style.display = 'block'; }
+  function showMsg(el, type, html) {
+    el.className = 'form-message ' + type;
+    el.innerHTML = html;
+    el.style.display = 'block';
+    el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
 
   function shareSaying(id) {
     const s = sayings.find(x => x.id === parseInt(id));
