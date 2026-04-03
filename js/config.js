@@ -7,7 +7,7 @@ const SABEDORIA_CONFIG = {
   // URL do Cloudflare Worker — preenchido automaticamente no deploy.
   // Para desenvolvimento local: inicie o worker com `npm run dev` na pasta worker/
   // e coloque aqui a URL local (ex: http://localhost:8787)
-  apiEndpoint: '',
+  apiEndpoint: 'https://sabedoria-api.marcos-account-aa6.workers.dev',
 
   // Nome do site e da vovó
   siteName: 'Sabedoria da Eulina',

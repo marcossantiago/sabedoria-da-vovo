@@ -54,7 +54,7 @@ jobs:
           WORKER_ENDPOINT: ${{ vars.WORKER_ENDPOINT }}
         run: |
           [ -n "$WORKER_ENDPOINT" ] && \
-            sed -i "s|apiEndpoint: ''|apiEndpoint: '$WORKER_ENDPOINT'|g" js/config.js || true
+            sed -i "s|apiEndpoint: '.*'|apiEndpoint: '$WORKER_ENDPOINT'|g" js/config.js || true
 
       - uses: actions/configure-pages@v4
 
