@@ -24,13 +24,11 @@ jobs:
         working-directory: worker
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'npm'
           cache-dependency-path: worker/package-lock.json
-
       - run: npm ci
 
       - name: Deploy worker
@@ -48,16 +46,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-
-      - name: Inject worker endpoint into config.js
-        env:
-          WORKER_ENDPOINT: ${{ vars.WORKER_ENDPOINT }}
-        run: |
-          [ -n "$WORKER_ENDPOINT" ] && \
-            sed -i "s|apiEndpoint: '.*'|apiEndpoint: '$WORKER_ENDPOINT'|g" js/config.js || true
-
       - uses: actions/configure-pages@v4
-
       - uses: actions/upload-pages-artifact@v3
         with:
           path: '.'

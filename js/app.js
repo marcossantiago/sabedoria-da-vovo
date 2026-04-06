@@ -214,13 +214,7 @@
       const password = document.getElementById('field-password').value;
 
       if (!text) { showMsg(msg, 'error', 'O ditado é obrigatório!'); return; }
-
-      if (!CONFIG.apiEndpoint) {
-        const today = new Date().toISOString().split('T')[0];
-        const json = JSON.stringify({ text, author, date: today, context: context || null, image: null }, null, 2);
-        showMsg(msg, 'success', `<strong>Ditado registrado!</strong><br><br>Adicione ao arquivo <code>sayings/data.json</code>:<br><br><code style="display:block;background:var(--cream);padding:0.8rem;font-size:0.8rem;text-align:left;word-break:break-all;border:1px solid var(--gold-light);margin-top:0.5rem;">${esc(json)}</code>`);
-        form.reset(); return;
-      }
+      if (!CONFIG.apiEndpoint) { showMsg(msg, 'error', 'API não configurada.'); return; }
 
       if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = 'Enviando...'; }
       showMsg(msg, 'info', 'Enviando sugestão...');
