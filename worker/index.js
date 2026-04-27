@@ -101,6 +101,8 @@ async function createPR(env, text, author, context) {
         `**Autor:** ${author}`,
         `**Contexto:** ${context ?? 'N/A'}`,
         `**Data:** ${today}`,
+        '',
+        `cc @${GITHUB_OWNER}`,
       ].join('\n'),
       head: branchName,
       base: GITHUB_BRANCH,
@@ -108,14 +110,6 @@ async function createPR(env, text, author, context) {
   });
 
   const pr = await prRes.json();
-
-  // Tag the maintainer as reviewer
-  await ghFetch(`${api}/pulls/${pr.number}/requested_reviewers`, {
-    method: 'POST',
-    headers,
-    body: JSON.stringify({ reviewers: [GITHUB_OWNER] }),
-  });
-
   return pr.html_url;
 }
 
