@@ -56,36 +56,34 @@ async function createPR(env, text, author, context) {
     'User-Agent': 'sabedoria-worker/1.0',
   };
 
-  // Fetch current data.json from GitHub
-  const fileRes = await ghFetch(`${api}/contents/sayings/data.json?ref=${GITHUB_BRANCH}`, { headers });
-  const fileData = await fileRes.json();
-  const current = JSON.parse(decodeBase64(fileData.content));
-
-  // Append new saying
   const today = new Date().toISOString().split('T')[0];
-  current.push({ text, author, date: today, context, image: null });
+  const timestamp = Date.now();
+  const branchName = `novo-ditado-${timestamp}`;
+  const entryPath = `sayings/entries/${timestamp}.json`;
+  const entryContent = encodeBase64(JSON.stringify(
+    { text, author, date: today, context, image: null },
+    null, 2
+  ) + '\n');
 
-  // Get current SHA of the branch
+  // Get current SHA of the base branch
   const refRes = await ghFetch(`${api}/git/ref/heads/${GITHUB_BRANCH}`, { headers });
   const { object: { sha: branchSha } } = await refRes.json();
 
   // Create a new branch
-  const branchName = `novo-ditado-${Date.now()}`;
   await ghFetch(`${api}/git/refs`, {
     method: 'POST',
     headers,
     body: JSON.stringify({ ref: `refs/heads/${branchName}`, sha: branchSha }),
   });
 
-  // Commit updated data.json to the new branch
-  await ghFetch(`${api}/contents/sayings/data.json`, {
+  // Commit the single entry file to the new branch
+  await ghFetch(`${api}/contents/${entryPath}`, {
     method: 'PUT',
     headers,
     body: JSON.stringify({
       message: `Novo ditado: "${text.substring(0, 60)}"`,
-      content: encodeBase64(JSON.stringify(current, null, 2)),
+      content: entryContent,
       branch: branchName,
-      sha: fileData.sha,
     }),
   });
 
