@@ -110,6 +110,14 @@ async function createPR(env, text, author, context) {
   });
 
   const pr = await prRes.json();
+
+  // Tag the maintainer as reviewer
+  await ghFetch(`${api}/pulls/${pr.number}/requested_reviewers`, {
+    method: 'POST',
+    headers,
+    body: JSON.stringify({ reviewers: [GITHUB_OWNER] }),
+  });
+
   return pr.html_url;
 }
 
